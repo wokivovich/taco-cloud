@@ -7,14 +7,13 @@ import com.wokivovich.tacocloud.entity.TacoOrder;
 import com.wokivovich.tacocloud.repo.IngredientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,7 +31,7 @@ public class DesignTacoController {
 
     @ModelAttribute
     public void addIngredientsToModel(Model model) {
-        List<Ingredient> ingredients = ingredientRepository.findAll();
+        Iterable<Ingredient> ingredients = ingredientRepository.findAll();
 
         Type[] types = Ingredient.Type.values();
         for (Type type : types) {
@@ -67,8 +66,8 @@ public class DesignTacoController {
         return "redirect:/orders/current";
     }
 
-    private Iterable<Ingredient> filterByType(List<Ingredient> ingredients, Type type) {
-        return ingredients
+    private Iterable<Ingredient> filterByType(Iterable<Ingredient> ingredients, Type type) {
+        return Streamable.of(ingredients).toList()
                 .stream()
                 .filter(x -> x.getType().equals(type))
                 .collect(Collectors.toList());
